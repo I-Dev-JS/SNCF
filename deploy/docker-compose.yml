@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  public-transports-are-a-joke:
+    image: registry.gitlab.com/jainaisisse/public-transports-are-a-joke:latest
+    network_mode: host
+    environment:
+      - NODE_ENV=production
+
+      - NAVITIA_SNCF_TOKEN=${NAVITIA_SNCF_TOKEN}
+
+      - TWITTER_CONSUMER_KEY=${TWITTER_CONSUMER_KEY}
+      - TWITTER_CONSUMER_SECRET=${TWITTER_CONSUMER_SECRET}
+      - TWITTER_ACCESS_TOKEN=${TWITTER_ACCESS_TOKEN}
+      - TWITTER_ACCESS_TOKEN_SECRET=${TWITTER_ACCESS_TOKEN_SECRET}
+
+      - HISTORY_LENGTH_IN_DAYS=${HISTORY_LENGTH_IN_DAYS}
+
+      - ALLOW_TWEETING=${ALLOW_TWEETING}
+    volumes:
+      - type: volume
+        source: db
+        target: /usr/src/app/db
+        volume:
+          nocopy: true
+    init: true
+    restart: always
+volumes:
+  db:
+    name: public-transports-are-a-joke-db
