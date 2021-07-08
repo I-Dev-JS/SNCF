@@ -1,0 +1,8 @@
+# Run daily report every day at 01:04 AM
+4 1 * * * cd /usr/src/app && yarn start --group sncf --time-span day 2>&1
+# Run weekly report every monday at 10:04 AM
+4 10 * * 1 cd /usr/src/app && yarn start --group sncf --time-span week 2>&1
+# Run monthly report every 1st day of each month at 05:04 PM
+4 17 1 * * cd /usr/src/app && yarn start --group sncf --time-span month 2>&1
+# Run yearly report every 1st day of each year at 07:04 AM
+4 7 1 1 * cd /usr/src/app && yarn start --group sncf --time-span year 2>&1

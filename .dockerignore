@@ -1,0 +1,8 @@
+# Global
+.idea/
+*.iml
+node_modules/
+screenshots/
+deploy/
+logs/
+dist/

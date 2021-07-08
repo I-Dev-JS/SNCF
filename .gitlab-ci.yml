@@ -1,0 +1,62 @@
+stages:
+  - lint
+  - build
+  - push
+
+variables:
+  CONTAINER_COMMIT_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  CONTAINER_LATEST_IMAGE: $CI_REGISTRY_IMAGE:latest
+  CONTAINER_TAG_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+
+default:
+  image: docker:20.10.5
+  services:
+    - docker:20.10.5-dind
+  before_script:
+    - echo -n "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+
+lint:
+  stage: lint
+  image: node:15.11.0-alpine3.13
+  before_script: []
+  services: []
+  script:
+    - echo "====== Install dependencies ======"
+    - yarn install --frozen-lockfile
+    - echo "====== Lint ======"
+    - yarn lint
+  only:
+    - master
+
+build:
+  stage: build
+  script:
+    - docker pull $CONTAINER_LATEST_IMAGE || true
+    - >
+      docker build
+      --pull
+      --cache-from $CONTAINER_LATEST_IMAGE
+      --tag $CONTAINER_COMMIT_IMAGE
+      -f Dockerfile
+      .
+    - docker push $CONTAINER_COMMIT_IMAGE
+  only:
+    - master
+
+push_latest:
+  stage: push
+  script:
+    - docker pull $CONTAINER_COMMIT_IMAGE
+    - docker tag $CONTAINER_COMMIT_IMAGE $CONTAINER_LATEST_IMAGE
+    - docker push $CONTAINER_LATEST_IMAGE
+  only:
+    - master
+
+push_tag:
+  stage: push
+  script:
+    - docker pull $CONTAINER_COMMIT_IMAGE
+    - docker tag $CONTAINER_COMMIT_IMAGE $CONTAINER_TAG_IMAGE
+    - docker push $CONTAINER_TAG_IMAGE
+  only:
+    - tags
